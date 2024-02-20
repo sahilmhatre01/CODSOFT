@@ -1,2 +1,2 @@
 # CODSOFT
-I have successfully completed my Java  Programming internship   
+I have successfully completed my Java  Programming internship 

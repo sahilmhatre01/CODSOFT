@@ -1,0 +1,87 @@
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class Main {
+    private static final int QUIZ_TIME_PER_QUESTION = 10; // in seconds
+    private static final int NUM_QUESTIONS = 3; // Change this to the number of questions in your quiz
+
+    private static String[] questions = {
+        "What is the largest ocean in the world?",
+        "Who wrote the famous novel 'To Kill a Mockingbird'?",
+        "What is the chemical symbol for water?"
+    };
+
+    private static String[][] options = {
+        {"A. Pacific Ocean", "B. Atlantic Ocean", "C. Indian Ocean", "D. Arctic Ocean"},
+        {"A. Ernest Hemingway", "B. Harper Lee", "C. Mark Twain", "D. F. Scott Fitzgerald"},
+        {"A. NaCl", "B. CO2", "C. H2O", "D. O2"}
+    };
+
+    private static int[] correctAnswers = {1, 2, 3}; // Index of correct options (1-based)
+
+    private static int userScore = 0;
+    private static int currentQuestionIndex = 0;
+
+    public static void main(String[] args) {
+        Timer timer = new Timer();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to the Quiz Application!");
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            private int timeRemaining = QUIZ_TIME_PER_QUESTION;
+
+            @Override
+            public void run() {
+                System.out.println("\nQuestion " + (currentQuestionIndex + 1) + ": " + questions[currentQuestionIndex]);
+                for (String option : options[currentQuestionIndex]) {
+                    System.out.println(option);
+                }
+
+                System.out.println("Time remaining: " + timeRemaining + " seconds");
+
+                int userAnswer = -1;
+                try {
+                    userAnswer = scanner.nextInt();
+                } catch (Exception e) {
+                    // Handle non-integer input
+                }
+
+                if (userAnswer > 0 && userAnswer <= options[currentQuestionIndex].length) {
+                    checkAnswer(userAnswer);
+                    if (currentQuestionIndex < NUM_QUESTIONS - 1) {
+                        currentQuestionIndex++;
+                        timeRemaining = QUIZ_TIME_PER_QUESTION;
+                    } else {
+                        endQuiz(timer, scanner);
+                    }
+                } else {
+                    System.out.println("Invalid choice. Please enter a number between 1 and " + options[currentQuestionIndex].length);
+                }
+            }
+
+            private void checkAnswer(int userAnswer) {
+                if (userAnswer == correctAnswers[currentQuestionIndex]) {
+                    System.out.println("Correct!");
+                    userScore++;
+                } else {
+                    System.out.println("Incorrect. The correct answer was: " + options[currentQuestionIndex][correctAnswers[currentQuestionIndex] - 1]);
+                }
+            }
+        }, 0, 1000);
+    }
+
+    private static void endQuiz(Timer timer, Scanner scanner) {
+        timer.cancel();
+        System.out.println("\nQuiz ended! Your final score is: " + userScore + " out of " + NUM_QUESTIONS);
+
+        // Display summary of correct/incorrect answers
+        for (int i = 0; i < NUM_QUESTIONS; i++) {
+            System.out.println("Question " + (i + 1) + ": " + (correctAnswers[i] == i + 1 ? "Correct" : "Incorrect"));
+        }
+
+        scanner.close();
+        System.exit(0);
+    }
+}
